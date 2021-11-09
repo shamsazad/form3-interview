@@ -24,7 +24,7 @@ type AccountAttributes struct {
 	BankIDCode              string   `json:"bank_id_code,omitempty"`
 	BaseCurrency            string   `json:"base_currency,omitempty"`
 	Bic                     string   `json:"bic,omitempty"`
-	Country                 *string  `json:"country,omitempty"`
+	Country                 *string  `json:"country,omitempty" validate:"required,country"`
 	Iban                    string   `json:"iban,omitempty"`
 	JointAccount            *bool    `json:"joint_account,omitempty"`
 	Name                    []string `json:"name,omitempty"`

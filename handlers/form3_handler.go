@@ -24,11 +24,13 @@ func GetAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseW
 		}
 		if account, err = form3Client.GetAccount(accountId); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-		w.WriteHeader(http.StatusOK)
 		if err = json.NewEncoder(w).Encode(account); err != nil {
 			http.Error(w, errors.Wrap(err, "Could not encode account into json").Error(), http.StatusInternalServerError)
+			return
 		}
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 }
@@ -51,9 +53,9 @@ func DeleteAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 			http.Error(w, errors.Wrap(nil, "Missing 'version' param").Error(), http.StatusBadRequest)
 			return
 		}
-
 		if err = form3Client.DeleteAccount(accountId, version); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -68,12 +70,14 @@ func CreateAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 		)
 
 		if account, err = form3Client.PostAccount(r.Body); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
-		w.WriteHeader(http.StatusOK)
 		if err = json.NewEncoder(w).Encode(account); err != nil {
 			http.Error(w, errors.Wrap(err, "Could not encode account into json").Error(), http.StatusInternalServerError)
+			return
 		}
+		w.WriteHeader(http.StatusCreated)
 		return
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"form3-interview/models"
 	"github.com/pkg/errors"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -92,5 +93,12 @@ func doForm3HttpRequest(url string, body io.Reader, method string) (*http.Respon
 	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+	status := resp.StatusCode
+	if status == http.StatusOK || status == http.StatusNoContent || status == http.StatusCreated {
+		return resp, nil
+	} else {
+		respBody, _ := ioutil.ReadAll(resp.Body)
+		err := errors.New(string(respBody))
+		return nil, err
+	}
 }
