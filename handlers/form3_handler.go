@@ -10,19 +10,16 @@ import (
 	"net/http"
 )
 
-
 func GetAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			account models.AccountWrapper
 			err     error
 		)
-		log.Println("inside GetAccount")
 		pathParams := mux.Vars(r)
 		accountId := pathParams["accountId"]
-		log.Println("accountId", accountId)
 		if accountId == "" {
-			http.Error(w, errors.Wrap(nil, "Missing 'variantId' param").Error(), http.StatusBadRequest)
+			http.Error(w, errors.Wrap(nil, "Missing 'accountId' param").Error(), http.StatusBadRequest)
 			return
 		}
 		if account, err = form3Client.GetAccount(accountId); err != nil {
@@ -30,8 +27,35 @@ func GetAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseW
 		}
 		w.WriteHeader(http.StatusOK)
 		if err = json.NewEncoder(w).Encode(account); err != nil {
-			http.Error(w, errors.Wrap(err, "Could not encode QbcVariant into json").Error(), http.StatusInternalServerError)
+			http.Error(w, errors.Wrap(err, "Could not encode account into json").Error(), http.StatusInternalServerError)
 		}
+		return
+	}
+}
+
+func DeleteAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var (
+			err error
+		)
+		log.Println("inside delete")
+		params := mux.Vars(r)
+		accountId := params["accountId"]
+		if accountId == "" {
+			http.Error(w, errors.Wrap(nil, "Missing 'accountId' param").Error(), http.StatusBadRequest)
+			return
+		}
+		version := r.URL.Query().Get("version")
+		log.Println(version)
+		if version == "" {
+			http.Error(w, errors.Wrap(nil, "Missing 'version' param").Error(), http.StatusBadRequest)
+			return
+		}
+
+		if err = form3Client.DeleteAccount(accountId, version); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 }
@@ -46,7 +70,6 @@ func CreateAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 		if account, err = form3Client.PostAccount(r.Body); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		log.Println(account)
 		w.WriteHeader(http.StatusOK)
 		if err = json.NewEncoder(w).Encode(account); err != nil {
 			http.Error(w, errors.Wrap(err, "Could not encode account into json").Error(), http.StatusInternalServerError)
@@ -54,4 +77,3 @@ func CreateAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 		return
 	}
 }
-
