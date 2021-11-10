@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -65,16 +66,12 @@ func (c Form3Client) PostAccount(body io.Reader) (account models.AccountWrapper,
 }
 
 func (c Form3Client) DeleteAccount(accountId string, version string) (err error) {
-	var resp *http.Response
+	//var _ *http.Response
 	url := BuildBaseUrl()
 	fullUrl := url + pathUrl + "/" + accountId + "?version=" + version
 
-	if resp, err = doForm3HttpRequest(fullUrl, nil, "DELETE"); err != nil {
-		return errors.Wrap(err, "Unable to create get request for account")
-	}
-
-	if resp.Status != http.StatusText(204) {
-		return errors.Wrap(err, "Unable to delete the account")
+	if _, err = doForm3HttpRequest(fullUrl, nil, "DELETE"); err != nil {
+		return errors.Wrap(err, "Unable to delete requested account for id "+accountId+",account not found")
 	}
 	return
 }
@@ -91,6 +88,7 @@ func doForm3HttpRequest(url string, body io.Reader, method string) (*http.Respon
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	status := resp.StatusCode
@@ -99,6 +97,7 @@ func doForm3HttpRequest(url string, body io.Reader, method string) (*http.Respon
 	} else {
 		respBody, _ := ioutil.ReadAll(resp.Body)
 		err := errors.New(string(respBody))
+		log.Println(err)
 		return nil, err
 	}
 }

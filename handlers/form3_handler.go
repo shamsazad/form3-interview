@@ -6,7 +6,6 @@ import (
 	"form3-interview/models"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"log"
 	"net/http"
 )
 
@@ -40,15 +39,15 @@ func DeleteAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 		var (
 			err error
 		)
-		log.Println("inside delete")
+
 		params := mux.Vars(r)
 		accountId := params["accountId"]
 		if accountId == "" {
 			http.Error(w, errors.Wrap(nil, "Missing 'accountId' param").Error(), http.StatusBadRequest)
 			return
 		}
+
 		version := r.URL.Query().Get("version")
-		log.Println(version)
 		if version == "" {
 			http.Error(w, errors.Wrap(nil, "Missing 'version' param").Error(), http.StatusBadRequest)
 			return
