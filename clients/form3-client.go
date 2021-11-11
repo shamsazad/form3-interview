@@ -66,7 +66,6 @@ func (c Form3Client) PostAccount(body io.Reader) (account models.AccountWrapper,
 }
 
 func (c Form3Client) DeleteAccount(accountId string, version string) (err error) {
-	//var _ *http.Response
 	url := BuildBaseUrl()
 	fullUrl := url + pathUrl + "/" + accountId + "?version=" + version
 
@@ -91,6 +90,7 @@ func doForm3HttpRequest(url string, body io.Reader, method string) (*http.Respon
 		log.Println(err)
 		return nil, err
 	}
+	defer resp.Body.Close()
 	status := resp.StatusCode
 	if status == http.StatusOK || status == http.StatusNoContent || status == http.StatusCreated {
 		return resp, nil
