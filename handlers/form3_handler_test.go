@@ -7,6 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/pariz/gountries"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -118,6 +119,52 @@ func Test_form3DeleteHandler(t *testing.T) {
 			rr := httptest.NewRecorder()
 			test.mockShop(mockClient)
 			handler := http.HandlerFunc(handlers.DeleteAccount(mockClient))
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, test.status, rr.Code)
+		})
+	}
+}
+
+func Test_form3PostHandler(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name     string
+		mockShop func(mock *mock_form3_client.MockForm3ClientIface)
+		status   int
+	}{
+		{
+			name: "unable to reach server",
+			mockShop: func(mock *mock_form3_client.MockForm3ClientIface) {
+				mock.EXPECT().PostAccount(gomock.Any()).Return(models.AccountWrapper{}, errors.New("unable to reach server"))
+			},
+			status: http.StatusBadRequest,
+		},
+		{
+			name: "happy path, created",
+			mockShop: func(mock *mock_form3_client.MockForm3ClientIface) {
+				mock.EXPECT().PostAccount(gomock.Any()).Return(mockedAccount(), nil)
+			},
+			status: http.StatusOK,
+		},
+	}
+
+	for _, test := range testCases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			req, err := http.NewRequest("POST", "/form3Client/accounts", nil)
+			if err != nil {
+				t.Errorf("Error creating a new request: %v", err)
+			}
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockClient := mock_form3_client.NewMockForm3ClientIface(ctrl)
+			rr := httptest.NewRecorder()
+			test.mockShop(mockClient)
+			handler := http.HandlerFunc(handlers.CreateAccount(mockClient))
 			handler.ServeHTTP(rr, req)
 
 			assert.Equal(t, test.status, rr.Code)

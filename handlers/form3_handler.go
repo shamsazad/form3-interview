@@ -15,6 +15,7 @@ func GetAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseW
 			account models.AccountWrapper
 			err     error
 		)
+		w.Header().Set("Content-Type", "application/json")
 		pathParams := mux.Vars(r)
 		accountId, ok := pathParams["accountId"]
 		if !ok {
@@ -40,6 +41,7 @@ func DeleteAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 			err error
 		)
 
+		w.Header().Set("Content-Type", "application/json")
 		params := mux.Vars(r)
 		accountId, ok := params["accountId"]
 		if !ok {
@@ -68,6 +70,7 @@ func CreateAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 			err     error
 		)
 
+		w.Header().Set("Content-Type", "application/json")
 		if account, err = form3Client.PostAccount(r.Body); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
