@@ -10,7 +10,7 @@ import (
 
 type App struct {
 	Router *mux.Router
-	Client form3_client.Form3Client
+	Client form3_client.Form3ClientIface
 }
 
 var app *App
@@ -18,7 +18,9 @@ var app *App
 func NewApp() *App {
 	return &App{
 		Router: mux.NewRouter().StrictSlash(true),
-		Client: form3_client.Form3Client{},
+		Client: &form3_client.Form3Client{
+			HttpClient: &http.Client{},
+		},
 	}
 }
 

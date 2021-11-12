@@ -16,9 +16,9 @@ func GetAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseW
 			err     error
 		)
 		pathParams := mux.Vars(r)
-		accountId := pathParams["accountId"]
-		if accountId == "" {
-			http.Error(w, errors.Wrap(nil, "Missing 'accountId' param").Error(), http.StatusBadRequest)
+		accountId, ok := pathParams["accountId"]
+		if !ok {
+			http.Error(w, errors.Wrap(errors.New("validation"), "Missing 'accountId' param").Error(), http.StatusBadRequest)
 			return
 		}
 		if account, err = form3Client.GetAccount(accountId); err != nil {
@@ -41,15 +41,15 @@ func DeleteAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 		)
 
 		params := mux.Vars(r)
-		accountId := params["accountId"]
-		if accountId == "" {
-			http.Error(w, errors.Wrap(nil, "Missing 'accountId' param").Error(), http.StatusBadRequest)
+		accountId, ok := params["accountId"]
+		if !ok {
+			http.Error(w, errors.Wrap(errors.New("validation"), "Missing 'accountId' param").Error(), http.StatusBadRequest)
 			return
 		}
 
 		version := r.URL.Query().Get("version")
-		if version == "" {
-			http.Error(w, errors.Wrap(nil, "Missing 'version' param").Error(), http.StatusBadRequest)
+		if len(version) == 0 {
+			http.Error(w, errors.Wrap(errors.New("validation"), "Missing 'version' param").Error(), http.StatusBadRequest)
 			return
 		}
 		if err = form3Client.DeleteAccount(accountId, version); err != nil {
