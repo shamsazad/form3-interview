@@ -121,34 +121,6 @@ func validation(resp *http.Response) (err error) {
 	}
 }
 
-/*func (c Form3Client) doForm3HttpRequest(url string, body io.Reader, method string) (*http.Response, error) {
-	var (
-		req *http.Request
-		err error
-	)
-	if req, err = http.NewRequest(method, url, body); err != nil {
-		return nil, errors.Wrap(err, "Unable to create new http client request")
-	}
-	req.Header.Add("Content-Type", "application/json")
-	//client := &http.Client{}
-	//resp, err := client.Do(req)
-	resp, err := c.HttpClient.Do(req)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	//defer resp.Body.Close()
-	status := resp.StatusCode
-	if status == http.StatusOK || status == http.StatusNoContent || status == http.StatusCreated {
-		return resp, nil
-	} else {
-		respBody, _ := ioutil.ReadAll(resp.Body)
-		err := errors.New(string(respBody))
-		log.Println(err)
-		return nil, err
-	}
-}*/
-
 func (c *Form3Client) Do(req *http.Request) (*http.Response, error) {
 	var (
 		resp *http.Response
