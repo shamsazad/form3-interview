@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -14,10 +15,7 @@ type App struct {
 	Client form3_client.Form3ClientIface
 }
 
-var (
-	baseURL,
-	app *App
-)
+var app *App
 
 func NewApp() *App {
 	return &App{
@@ -26,9 +24,17 @@ func NewApp() *App {
 			HttpClient: &http.Client{
 				Timeout: 5 * time.Second,
 			},
-			BaseURL: "http://localhost:8080/",
+			BaseURL: getEnv("BASE_URL", "http://localhost:8080/"),
 		},
 	}
+}
+
+func getEnv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
 }
 
 func (a *App) HandleRequests() {
