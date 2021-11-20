@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"time"
 )
 
 type App struct {
@@ -13,13 +14,19 @@ type App struct {
 	Client form3_client.Form3ClientIface
 }
 
-var app *App
+var (
+	baseURL,
+	app *App
+)
 
 func NewApp() *App {
 	return &App{
 		Router: mux.NewRouter().StrictSlash(true),
 		Client: &form3_client.Form3Client{
-			HttpClient: &http.Client{},
+			HttpClient: &http.Client{
+				Timeout: 5 * time.Second,
+			},
+			BaseURL: "http://localhost:8080/",
 		},
 	}
 }

@@ -32,10 +32,18 @@ func Test_form3GetHandler(t *testing.T) {
 			status:    http.StatusBadRequest,
 		},
 		{
-			name:      "happy path, accounts created",
+			name:      "account not found",
 			pathParam: map[string]string{"accountId": ""},
 			mockShop: func(mock *mock_form3_client.MockForm3ClientIface) {
-				mock.EXPECT().GetAccount(gomock.Any()).Return(mockedAccount(), nil)
+				mock.EXPECT().GetAccount(gomock.Any()).Return(models.AccountWrapper{}, models.NewAppError(errors.New(""), "", 404))
+			},
+			status: http.StatusNotFound,
+		},
+		{
+			name:      "happy path, account found",
+			pathParam: map[string]string{"accountId": ""},
+			mockShop: func(mock *mock_form3_client.MockForm3ClientIface) {
+				mock.EXPECT().GetAccount(gomock.Any()).Return(mockedAccount(), models.AppError{})
 			},
 			status: http.StatusOK,
 		},
@@ -47,7 +55,7 @@ func Test_form3GetHandler(t *testing.T) {
 			t.Parallel()
 			req, err := http.NewRequest("GET", "/form3Client/accounts/", nil)
 			if err != nil {
-				t.Errorf("Error creating a new request: %v", err)
+				t.Fatalf("Error creating a new request: %v", err)
 			}
 			req = mux.SetURLVars(req, test.pathParam)
 
@@ -94,7 +102,7 @@ func Test_form3DeleteHandler(t *testing.T) {
 			pathParam: map[string]string{"accountId": "1234"},
 			version:   "1",
 			mockShop: func(mock *mock_form3_client.MockForm3ClientIface) {
-				mock.EXPECT().DeleteAccount(gomock.Any(), gomock.Any()).Return(nil)
+				mock.EXPECT().DeleteAccount(gomock.Any(), gomock.Any()).Return(models.AppError{})
 			},
 			status: http.StatusNoContent,
 		},
@@ -137,14 +145,14 @@ func Test_form3PostHandler(t *testing.T) {
 		{
 			name: "unable to reach server",
 			mockShop: func(mock *mock_form3_client.MockForm3ClientIface) {
-				mock.EXPECT().PostAccount(gomock.Any()).Return(models.AccountWrapper{}, errors.New("unable to reach server"))
+				mock.EXPECT().PostAccount(gomock.Any()).Return(models.AccountWrapper{}, models.NewAppError(errors.New("unable to reach server"), "unable to reach server", 500))
 			},
-			status: http.StatusBadRequest,
+			status: http.StatusInternalServerError,
 		},
 		{
 			name: "happy path, created",
 			mockShop: func(mock *mock_form3_client.MockForm3ClientIface) {
-				mock.EXPECT().PostAccount(gomock.Any()).Return(mockedAccount(), nil)
+				mock.EXPECT().PostAccount(gomock.Any()).Return(mockedAccount(), models.AppError{})
 			},
 			status: http.StatusOK,
 		},

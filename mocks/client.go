@@ -37,10 +37,10 @@ func (m *MockForm3ClientIface) EXPECT() *MockForm3ClientIfaceMockRecorder {
 }
 
 // DeleteAccount mocks base method.
-func (m *MockForm3ClientIface) DeleteAccount(accountId, version string) error {
+func (m *MockForm3ClientIface) DeleteAccount(accountId, version string) models.AppError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteAccount", accountId, version)
-	ret0, _ := ret[0].(error)
+	ret0, _ := ret[0].(models.AppError)
 	return ret0
 }
 
@@ -66,11 +66,11 @@ func (mr *MockForm3ClientIfaceMockRecorder) Do(req interface{}) *gomock.Call {
 }
 
 // GetAccount mocks base method.
-func (m *MockForm3ClientIface) GetAccount(accountId string) (models.AccountWrapper, error) {
+func (m *MockForm3ClientIface) GetAccount(accountId string) (models.AccountWrapper, models.AppError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAccount", accountId)
 	ret0, _ := ret[0].(models.AccountWrapper)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(models.AppError)
 	return ret0, ret1
 }
 
@@ -81,11 +81,11 @@ func (mr *MockForm3ClientIfaceMockRecorder) GetAccount(accountId interface{}) *g
 }
 
 // PostAccount mocks base method.
-func (m *MockForm3ClientIface) PostAccount(body io.Reader) (models.AccountWrapper, error) {
+func (m *MockForm3ClientIface) PostAccount(body io.Reader) (models.AccountWrapper, models.AppError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PostAccount", body)
 	ret0, _ := ret[0].(models.AccountWrapper)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(models.AppError)
 	return ret0, ret1
 }
 
