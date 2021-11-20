@@ -12,8 +12,9 @@ import (
 func GetAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
-			account models.AccountWrapper
-			err     error
+			account  models.AccountWrapper
+			err      error
+			appError models.AppError
 		)
 		w.Header().Set("Content-Type", "application/json")
 		pathParams := mux.Vars(r)
@@ -22,8 +23,8 @@ func GetAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseW
 			http.Error(w, errors.Wrap(errors.New("validation"), "Missing 'accountId' param").Error(), http.StatusBadRequest)
 			return
 		}
-		if account, err = form3Client.GetAccount(accountId); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if account, appError = form3Client.GetAccount(accountId); appError.Error != nil {
+			http.Error(w, appError.Error.Error(), appError.Code)
 			return
 		}
 		if err = json.NewEncoder(w).Encode(account); err != nil {
@@ -37,9 +38,6 @@ func GetAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseW
 
 func DeleteAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var (
-			err error
-		)
 
 		w.Header().Set("Content-Type", "application/json")
 		params := mux.Vars(r)
@@ -54,8 +52,8 @@ func DeleteAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 			http.Error(w, errors.Wrap(errors.New("validation"), "Missing 'version' param").Error(), http.StatusBadRequest)
 			return
 		}
-		if err = form3Client.DeleteAccount(accountId, version); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if appError := form3Client.DeleteAccount(accountId, version); appError.Error != nil {
+			http.Error(w, appError.Error.Error(), appError.Code)
 			return
 		}
 		w.WriteHeader(http.StatusNoContent)
@@ -66,13 +64,14 @@ func DeleteAccount(form3Client form3_client.Form3ClientIface) func(w http.Respon
 func CreateAccount(form3Client form3_client.Form3ClientIface) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
-			account models.AccountWrapper
-			err     error
+			account  models.AccountWrapper
+			err      error
+			appError models.AppError
 		)
 
 		w.Header().Set("Content-Type", "application/json")
-		if account, err = form3Client.PostAccount(r.Body); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		if account, appError = form3Client.PostAccount(r.Body); appError.Error != nil {
+			http.Error(w, appError.Error.Error(), appError.Code)
 			return
 		}
 		if err = json.NewEncoder(w).Encode(account); err != nil {
