@@ -12,6 +12,15 @@ import (
 	"testing"
 )
 
+var client form3_client.Form3Client
+
+func init() {
+	client = form3_client.Form3Client{
+		HttpClient: &http.Client{},
+		BaseURL:    getEnv("BASE_URL", "http://localhost:8080/"),
+	}
+}
+
 func Test_form3ClientGet(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
@@ -45,11 +54,6 @@ func Test_form3ClientGet(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-
-			client := form3_client.Form3Client{
-				HttpClient: &http.Client{},
-				BaseURL:    getEnv("BASE_URL", "http://localhost:8080/"),
-			}
 
 			if test.name == "happy path, account retrieved" {
 				createDummyAccount(test.accountId)
@@ -102,11 +106,6 @@ func Test_form3ClientPost(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-
-			client := form3_client.Form3Client{
-				HttpClient: &http.Client{},
-				BaseURL:    getEnv("BASE_URL", "http://localhost:8080/"),
-			}
 
 			account, err := client.PostAccount(test.givenPayload)
 			if test.err == nil {
@@ -163,11 +162,6 @@ func Test_form3ClientDelete(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			client := form3_client.Form3Client{
-				HttpClient: &http.Client{},
-				BaseURL:    getEnv("BASE_URL", "http://localhost:8080/"),
-			}
-
 			if test.name == "happy path, account deleted" {
 				createDummyAccount(test.accountId)
 			}
@@ -183,10 +177,6 @@ func Test_form3ClientDelete(t *testing.T) {
 }
 
 func createDummyAccount(accountId string) {
-	client := form3_client.Form3Client{
-		HttpClient: &http.Client{},
-		BaseURL:    getEnv("BASE_URL", "http://localhost:8080/"),
-	}
 	body := getBody(accountId)
 	client.PostAccount(body)
 }
@@ -197,12 +187,6 @@ func getBody(accountId string) io.Reader {
 }
 
 func deleteDummyAccount(accountId string) {
-
-	client := form3_client.Form3Client{
-		HttpClient: &http.Client{},
-		BaseURL:    getEnv("BASE_URL", "http://localhost:8080/"),
-	}
-
 	client.DeleteAccount(accountId, "0")
 }
 
