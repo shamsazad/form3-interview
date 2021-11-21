@@ -26,14 +26,6 @@ type Form3Client struct {
 	BaseURL    string
 }
 
-/*func BuildBaseUrl() string {
-	baseUrl := os.Getenv("BASE_URL")
-	if baseUrl == "" {
-		return "http://localhost:8080/"
-	}
-	return baseUrl
-}*/
-
 func (c Form3Client) GetAccount(accountId string) (account models.AccountWrapper, appError models.AppError) {
 
 	var (
