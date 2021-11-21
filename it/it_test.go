@@ -35,7 +35,7 @@ func Test_form3ClientGet(t *testing.T) {
 		},
 		{
 			name:      "happy path, account retrieved",
-			accountId: "cb1e2074-1056-4b27-b4e0-ed9f0c46b067",
+			accountId: "a112e318-ae38-4589-9d59-c5cd64afb989",
 			status:    http.StatusOK,
 			err:       nil,
 		},
@@ -52,7 +52,7 @@ func Test_form3ClientGet(t *testing.T) {
 			}
 
 			if test.name == "happy path, account retrieved" {
-				createDummyAccount()
+				createDummyAccount(test.accountId)
 			}
 
 			account, err := client.GetAccount(test.accountId)
@@ -91,9 +91,9 @@ func Test_form3ClientPost(t *testing.T) {
 		},
 		{
 			name:         "happy path, account created",
-			givenPayload: getBody(),
+			givenPayload: getBody("4ff753ac-bc01-46c5-ad54-055aaaef5a00"),
 			err:          nil,
-			accountId:    "cb1e2074-1056-4b27-b4e0-ed9f0c46b067",
+			accountId:    "4ff753ac-bc01-46c5-ad54-055aaaef5a00",
 			status:       http.StatusCreated,
 		},
 	}
@@ -152,7 +152,7 @@ func Test_form3ClientDelete(t *testing.T) {
 		},
 		{
 			name:      "happy path, account deleted",
-			accountId: "cb1e2074-1056-4b27-b4e0-ed9f0c46b067",
+			accountId: "ac48f757-ac69-4257-ac6f-479763c8432e",
 			version:   "0",
 			err:       nil,
 		},
@@ -169,7 +169,7 @@ func Test_form3ClientDelete(t *testing.T) {
 			}
 
 			if test.name == "happy path, account deleted" {
-				createDummyAccount()
+				createDummyAccount(test.accountId)
 			}
 			err := client.DeleteAccount(test.accountId, test.version)
 			if err.Error != nil {
@@ -182,17 +182,17 @@ func Test_form3ClientDelete(t *testing.T) {
 	}
 }
 
-func createDummyAccount() {
+func createDummyAccount(accountId string) {
 	client := form3_client.Form3Client{
 		HttpClient: &http.Client{},
 		BaseURL:    getEnv("BASE_URL", "http://localhost:8080/"),
 	}
-	body := getBody()
+	body := getBody(accountId)
 	client.PostAccount(body)
 }
 
-func getBody() io.Reader {
-	byteBody := []byte("{\n    \"data\": {\n        \"attributes\": {\n            \"account_classification\": \"Personal\",\n            \"account_matching_opt_out\": false,\n            \"alternative_names\": [\n                \"Sam Holder\"\n            ],\n            \"bank_id\": \"400300\",\n            \"bank_id_code\": \"GBDSC\",\n            \"base_currency\": \"GBP\",\n            \"bic\": \"NWBKGB22\",\n            \"country\": \"GB\",\n            \"joint_account\": false,\n            \"name\": [\n                \"Samantha Holder\"\n            ],\n            \"secondary_identification\": \"A1B2C3D4\"\n        },\n        \"id\": \"cb1e2074-1056-4b27-b4e0-ed9f0c46b067\",\n        \"organisation_id\": \"eb0bd6f5-c3f5-44b2-b677-acd23cdde73c\",\n        \"type\": \"accounts\",\n        \"version\": 0\n    }\n}")
+func getBody(accountId string) io.Reader {
+	byteBody := []byte("{\n    \"data\": {\n        \"attributes\": {\n            \"account_classification\": \"Personal\",\n            \"account_matching_opt_out\": false,\n            \"alternative_names\": [\n                \"Sam Holder\"\n            ],\n            \"bank_id\": \"400300\",\n            \"bank_id_code\": \"GBDSC\",\n            \"base_currency\": \"GBP\",\n            \"bic\": \"NWBKGB22\",\n            \"country\": \"GB\",\n            \"joint_account\": false,\n            \"name\": [\n                \"Samantha Holder\"\n            ],\n            \"secondary_identification\": \"A1B2C3D4\"\n        },\n        \"id\": \"" + accountId + "\" ,\n        \"organisation_id\": \"eb0bd6f5-c3f5-44b2-b677-acd23cdde73c\",\n        \"type\": \"accounts\",\n        \"version\": 0\n    }\n}")
 	return bytes.NewReader(byteBody)
 }
 
