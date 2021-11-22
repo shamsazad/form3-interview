@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -117,7 +116,6 @@ func validation(resp *http.Response) (appError models.AppError) {
 	} else {
 		respBody, _ := ioutil.ReadAll(resp.Body)
 		err := errors.New(string(respBody))
-		log.Println(err)
 		return models.NewAppError(err, string(respBody), status)
 	}
 }
