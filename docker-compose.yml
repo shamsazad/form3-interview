@@ -21,6 +21,20 @@ services:
       - DATABASE-PASSWORD=123
     ports:
       - 8080:8080
+
+  form3-client:
+    container_name: test-client
+    image: app-dev
+    depends_on:
+      - accountapi
+    build:
+      dockerfile: Dockerfile
+      context: .
+    environment:
+      - BASE_URL=http://accountapi:8080/
+    ports:
+      - "10000:10000"
+
   postgresql:
     image: postgres:9.5-alpine
     healthcheck:

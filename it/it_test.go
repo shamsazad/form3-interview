@@ -17,7 +17,7 @@ var client form3_client.Form3Client
 func init() {
 	client = form3_client.Form3Client{
 		HttpClient: &http.Client{},
-		BaseURL:    getEnv("BASE_URL", "http://localhost:8080/"),
+		BaseURL:    getEnv("BASE_URL", "http://accountapi:8080/"),
 	}
 }
 
